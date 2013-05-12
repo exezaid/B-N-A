@@ -3,6 +3,10 @@ import re
 
 class Commands(object):
 
+    def __init__(self):
+        self.get_gateway()
+        self.get_private_ip()
+
     def get_gateway(self):
         """docstring for fname"""
         trace_out = subprocess.Popen(["traceroute","-m 1","-q 5" ,"8.8.8.8"], shell=False, stdout=subprocess.PIPE)
@@ -21,7 +25,6 @@ class Commands(object):
         m = rg.search(txt)
         if m:
             ipaddress1=m.group(1)
-            print ipaddress1+"\n"
             self.gateway = ipaddress1
 
     def get_private_ip(self):
@@ -34,11 +37,12 @@ class Commands(object):
         m = rg.search(txt2)
         if m:
             ipaddress=m.group(1)
-            print ipaddress+"\n"
             self.private_ip = ipaddress
+
+    def ips(self):
+       return [self.gateway, self.private_ip]
 
 
 if __name__ == '__main__':
     cmd = Commands()
-    cmd.get_gateway()
-    cmd.get_private_ip()
+    print cmd.ips()

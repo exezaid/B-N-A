@@ -1,6 +1,7 @@
 import re
 from subprocess import Popen, PIPE, STDOUT
 from ifconfig import ifconfig
+from script_commands import Commands
 
 class CurrentIp():
     def __init__(self, interface = 'wlan0'):
@@ -38,10 +39,17 @@ class FPing():
 
     def alive_ips(self):
        arr = self.run().split("\n")
-       return filter(lambda cad: pattern.match(cad), arr)
+       return filter(lambda cad: self.pattern.match(cad), arr)
 
     def remove_special_ip(self, ip_list):
        ip_list = self.alive_ips()
        for ip in ip_list:
            ip_list.remove(ip)
        return ip_list
+
+if __name__ == "__main__":
+    cmd = Commands()
+    ip = cmd.private_ip
+    fping = FPing(ip)
+
+    print fping.remove_special_ip(cmd.ips())
