@@ -47,9 +47,37 @@ class FPing():
            ip_list.remove(ip)
        return ip_list
 
+
+class Nmap():
+    def __init__(self, ip):
+        self.ip = ip
+        self.cache = None
+
+    def build_command(self):
+        return ["sudo", "nmap", "-sV", "-T4", "-O", "-F", "--version-light", self.ip]
+
+    def run(self):
+        if not self.cache:
+            self.cache = Popen(self.build_command(),
+                               stdout=PIPE,
+                               stderr=STDOUT).communicate()[0]
+        return self.cache
+
+    def find_os(self):
+        output = self.run()
+        try:
+            return re.search("Service\sInfo\:\sOS\:(.+)", output).groups()[0]
+        except AttributeError:
+            return "SO no encontrado"
+
+
 if __name__ == "__main__":
     cmd = Commands()
     ip = cmd.private_ip
     fping = FPing(ip)
+    ips = fping.remove_special_ip(cmd.ips())
 
-    print fping.remove_special_ip(cmd.ips())
+    print ips
+    for ip in ips:
+        nmap = Nmap(ip)
+        print ip + ": " + nmap.find_os()
